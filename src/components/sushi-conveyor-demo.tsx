@@ -13,6 +13,7 @@ import { createCheckout } from "@/lib/checkout.functions";
 import { PaymentResult } from "@/components/payment-result";
 import { AccountDialog } from "@/components/account-dialog";
 import { useAccount } from "@/components/account-provider";
+import logoAsset from "@/assets/restorani-logo.png.asset.json";
 
 export default function SushiConveyorMenuDemo({ autoplay = true, payment, sessionId }: { autoplay?: boolean; payment?: "success" | "cancelled" | undefined; sessionId?: string | undefined }) {
   const { user } = useAccount();
@@ -76,10 +77,7 @@ export default function SushiConveyorMenuDemo({ autoplay = true, payment, sessio
   return (
     <div data-sushi-demo className="min-h-svh bg-background text-foreground">
       <header className="mx-auto flex max-w-7xl items-center justify-between gap-4 border-b px-6 py-6 md:px-10">
-        <div className="flex items-center gap-3">
-          <span className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground"><Utensils className="size-5" aria-hidden="true" /></span>
-          <div><p className="text-lg font-semibold">Sushi conveyor</p><p className="text-xs text-muted-foreground">Fresh plates. Good company.</p></div>
-        </div>
+        <img src={logoAsset.url} alt="Restorani.bar" width={740} height={434} className="w-36 min-w-0 shrink object-contain sm:w-48" />
         <div className="flex items-center gap-3">
           <AccountDialog />
           <span aria-live="polite" className="hidden text-xs text-accent-foreground sm:block">{flash ? "Added to your order" : ""}</span>
