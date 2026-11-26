@@ -3,5 +3,5 @@
 - [x] Confirm seller country: Estonia.
 - [ ] Add login-only accounts without a profiles table.
 - [ ] Store user-owned orders and enforce signed-in ordering.
-- [ ] Connect Stripe after the account choice is answered.
+- [x] Connect the existing Stripe account securely.
 - [ ] Implement and verify authenticated cart checkout and payment confirmation.
