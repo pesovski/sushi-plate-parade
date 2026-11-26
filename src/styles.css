@@ -145,4 +145,3 @@
 }
 @media (prefers-reduced-motion: reduce) { .menu-item-image { transition: none; } }
 
-.google-signin { background: var(--card); border-color: var(--muted-foreground); color: var(--foreground); font-weight: 500; }

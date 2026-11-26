@@ -11,3 +11,7 @@
 # Page branding
 - [x] Use the uploaded icon as the browser tab icon.
 - [x] Use the uploaded logo in the page header and verify it on desktop and mobile.
+
+# Sign-in methods
+- [x] Remove the Sign in with Lovable button.
+- [x] Remove the Google sign-in button; email and password remain.
