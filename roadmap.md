@@ -16,3 +16,9 @@
 # Sign-in methods
 - [x] Remove the Sign in with Lovable button.
 - [x] Remove the Google sign-in button; email and password remain.
+
+# Order confirmation emails
+- [x] Configure notify.restorani.bar as the sender domain (DNS verification pending).
+- [x] Prepare managed sending and a homepage-branded order confirmation template; secure preview renders on desktop and mobile.
+- [x] Send the itemized confirmation after verified payment; snapshot, paid-only, recipient, idempotency and suppression tests pass.
+- [ ] Verify real delivery: blocked until sender DNS verification completes and these changes are published.

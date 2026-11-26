@@ -8,11 +8,25 @@
 // hosting already compresses at the edge.
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { loadEnv, type ConfigEnv } from "vite";
+import path from "node:path";
 
-export default defineConfig({
+const appConfig = defineConfig({
+  vite: {
+    resolve: { alias: [
+      { find: "entities/lib/decode.js", replacement: path.resolve("node_modules/entities/lib/decode.js") },
+      { find: "entities/lib/encode.js", replacement: path.resolve("node_modules/entities/lib/encode.js") },
+      { find: /^entities$/, replacement: path.resolve("node_modules/entities") },
+    ] },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
   },
 });
+
+export default (env: ConfigEnv) => {
+  Object.assign(process.env, loadEnv(env.mode, process.cwd(), ""));
+  return appConfig(env);
+};

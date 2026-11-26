@@ -37,3 +37,5 @@ use the editor.
 - Private order reads use authenticated server functions and owner-scoped RLS; payment state is never writable by customers.
 - Checkout validates Cloud prices and stores item snapshots before sending one aggregate Stripe line; verify the Stripe session owner, total, and currency on return and when reading pending orders, without webhooks.
 - Keep only a temporary list of cart IDs in sessionStorage to survive OAuth navigation; never treat its contents as trusted prices or permissions.
+- Send order confirmations through managed email from verified-payment server code using trusted order snapshots, the authenticated owner's email, and an order-derived idempotency key; email failure must not reverse payment and no email tables or queues are needed.
+- Keep React Email templates in the managed registry with inline email-safe brand styles; `/lovable/` preview requests bypass application redirects and CSRF filtering because they authenticate themselves.

@@ -61,7 +61,24 @@ export const verifyCheckout = createServerFn({ method: "POST" })
     const userId = requireOrderUser(context.userId);
     const { data: order, error } = await context.supabase.from("orders").select("id,user_id,status,total_cents,currency,stripe_session_id,items,created_at").eq("stripe_session_id", data.sessionId).eq("user_id", userId).single();
     if (error || !order) throw new Error("This order is not available for your account.");
-    if (order.status === "paid") return order;
+    const notifyOwner = async (confirmed: typeof order) => {
+      try {
+        const { data: auth, error: authError } = await context.supabase.auth.getUser();
+        if (authError || auth.user?.id !== userId || !auth.user.email) return;
+        const { sendOrderConfirmation } = await import("@/lib/order-confirmation.server");
+        await sendOrderConfirmation(confirmed, auth.user.email);
+      } catch (cause) {
+        // Never undo confirmed payment when email is unavailable. A later verification
+        // can retry the same managed idempotency key without duplicating the email.
+        console.error("Order confirmation email unavailable", {
+          code: cause && typeof cause === "object" && "code" in cause ? cause.code : "confirmation_failed",
+        });
+      }
+    };
+    if (order.status === "paid") {
+      await notifyOwner(order);
+      return order;
+    }
     const key = process.env["STRIPE_SECRET_KEY"];
     if (!key) throw new Error("Payment verification is temporarily unavailable.");
     const { default: Stripe } = await import("stripe");
@@ -74,5 +91,7 @@ export const verifyCheckout = createServerFn({ method: "POST" })
       const { error: updateError } = await supabaseAdmin.from("orders").update({ status, ...(status === "paid" ? { paid_at: new Date().toISOString(), stripe_payment_intent_id: typeof session.payment_intent === "string" ? session.payment_intent : null } : {}) }).eq("id", order.id).eq("user_id", userId).neq("status", "paid");
       if (updateError) throw new Error("Could not save payment confirmation. Please retry.");
     }
-    return { ...order, status };
+    const confirmed = { ...order, status };
+    if (status === "paid") await notifyOwner(confirmed);
+    return confirmed;
   });
