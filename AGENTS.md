@@ -31,5 +31,9 @@ use the editor.
 
 ## Application structure
 - Keep the reusable conveyor in `src/components/ui/sushi-conveyor-menu.tsx` and its demo composition separate so animation and consumer order state remain independent.
-- Keep sample dishes and tier prices in `src/lib/sushi-menu.ts`, with CDN asset pointers, so all demo views share the same menu data.
-- Demo orders use ephemeral React state and do not submit purchases, so this integration needs no backend or payment service.
+- Read the product catalog from Cloud through a public read-only server function and route-loader query; the conveyor adapter only formats those rows.
+- Keep the cart in React state; completed orders belong in Cloud and must be created through an authenticated server function with server-owned catalog pricing.
+- Use one root account provider for session events and private-cache cleanup; no profiles table is needed for login-only accounts.
+- Private order reads use authenticated server functions and owner-scoped RLS; payment state is never writable by customers.
+- Checkout validates Cloud prices and stores item snapshots before sending one aggregate Stripe line; verify the Stripe session owner, total, and currency on return and when reading pending orders, without webhooks.
+- Keep only a temporary list of cart IDs in sessionStorage to survive OAuth navigation; never treat its contents as trusted prices or permissions.

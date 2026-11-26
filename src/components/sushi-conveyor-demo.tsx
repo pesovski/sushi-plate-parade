@@ -5,12 +5,56 @@ import { ArrowDown, ArrowUpRight, Check, CirclePlus, Minus, ShoppingBag, Utensil
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import SushiConveyorMenu, { type ConveyorDish } from "@/components/ui/sushi-conveyor-menu";
-import { SUSHI_BELT_DISHES, SUSHI_BELT_LEGEND } from "@/lib/sushi-menu";
+import { toConveyorDish } from "@/lib/sushi-menu";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { catalogOptions } from "@/lib/catalog-query";
+import { createCheckout } from "@/lib/checkout.functions";
+import { PaymentResult } from "@/components/payment-result";
+import { AccountDialog } from "@/components/account-dialog";
+import { useAccount } from "@/components/account-provider";
 
-export { SUSHI_BELT_DISHES, SUSHI_BELT_LEGEND } from "@/lib/sushi-menu";
-
-export default function SushiConveyorMenuDemo({ autoplay = true }: { autoplay?: boolean }) {
+export default function SushiConveyorMenuDemo({ autoplay = true, payment, sessionId }: { autoplay?: boolean; payment?: "success" | "cancelled" | undefined; sessionId?: string | undefined }) {
+  const { user } = useAccount();
+  const { data: catalog } = useSuspenseQuery(catalogOptions);
+  const dishes = React.useMemo(() => catalog.map(toConveyorDish), [catalog]);
+  const checkout = useServerFn(createCheckout);
+  const [checkoutBusy, setCheckoutBusy] = React.useState(false);
+  const [checkoutError, setCheckoutError] = React.useState("");
+  const attempt = React.useRef<string | null>(null);
   const [order, setOrder] = React.useState<ConveyorDish[]>([]);
+  const [restored, setRestored] = React.useState(false);
+  React.useEffect(() => {
+    try {
+      const stored: unknown = JSON.parse(sessionStorage.getItem("sushi-cart") ?? "[]");
+      if (Array.isArray(stored)) setOrder(stored.slice(0, 100).flatMap((id: unknown) => { const dish = dishes.find((entry) => entry.id === id); return dish ? [dish] : []; }));
+    } catch { /* An invalid navigation draft is discarded. */ }
+    setRestored(true);
+  }, [dishes]);
+  React.useEffect(() => {
+    if (restored) { try { sessionStorage.setItem("sushi-cart", JSON.stringify(order.map((item) => item.id))); } catch { /* Cart still works in memory. */ } }
+    attempt.current = null;
+  }, [order, restored]);
+  const clearPaidCart = React.useCallback(() => setOrder([]), []);
+  const pay = async () => {
+    if (!user || checkoutBusy || !order.length) return;
+    setCheckoutBusy(true); setCheckoutError("");
+    // Open synchronously so the payment tab is not blocked after the server call.
+    const tab = window.open("about:blank", "_blank");
+    if (tab) tab.opener = null;
+    try {
+      const quantities = new Map<string, number>();
+      for (const item of order) quantities.set(item.id, (quantities.get(item.id) ?? 0) + 1);
+      attempt.current ??= crypto.randomUUID();
+      const result = await checkout({ data: { items: [...quantities].map(([id, quantity]) => ({ id, quantity })), attempt: attempt.current } });
+      if (tab) tab.location.href = result.url;
+      else window.location.assign(result.url);
+    } catch (cause) {
+      tab?.close();
+      setCheckoutError(cause instanceof Error ? cause.message : "Checkout failed. Please try again.");
+      attempt.current = null;
+    } finally { setCheckoutBusy(false); }
+  };
   const [flash, setFlash] = React.useState(false);
   const [showMenu, setShowMenu] = React.useState(false);
   const timer = React.useRef(0);
@@ -33,6 +77,7 @@ export default function SushiConveyorMenuDemo({ autoplay = true }: { autoplay?: 
     <div data-sushi-demo className="min-h-svh bg-background text-foreground">
       <header className="mx-auto flex max-w-7xl items-center justify-between gap-4 border-b px-6 py-6 md:px-10">
         <div className="flex items-center gap-3">
+          <AccountDialog />
           <span className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground"><Utensils className="size-5" aria-hidden="true" /></span>
           <div><p className="text-lg font-semibold">Sushi conveyor</p><p className="text-xs text-muted-foreground">Fresh plates. Good company.</p></div>
         </div>
@@ -48,22 +93,24 @@ export default function SushiConveyorMenuDemo({ autoplay = true }: { autoplay?: 
               <DialogTitle>Your order</DialogTitle>
               <DialogDescription>{order.length ? `${order.length} ${order.length === 1 ? "plate" : "plates"} picked from the belt.` : "A little room for something delicious."}</DialogDescription>
               <div className="divide-y">
-                {SUSHI_BELT_DISHES.filter((dish) => order.some((item) => item.id === dish.id)).map((dish) => {
+                {dishes.filter((dish) => order.some((item) => item.id === dish.id)).map((dish) => {
                   const quantity = order.filter((item) => item.id === dish.id).length;
                   return <div key={dish.id} className="flex items-center gap-3 py-3"><img src={dish.image} alt="" className="size-14 object-contain" /><div className="flex-1"><p className="text-sm font-medium">{dish.name}</p><p className="text-xs text-muted-foreground">{quantity} × {dish.price}</p></div><Button variant="ghost" size="icon" aria-label={`Remove one ${dish.name}`} title={`Remove one ${dish.name}`} onClick={() => setOrder((previous) => { const index = previous.findIndex((item) => item.id === dish.id); return previous.filter((_, i) => i !== index); })}><Minus /></Button></div>;
                 })}
               </div>
               <div className="flex justify-between border-t pt-4 font-semibold"><span>Total</span><span>${total.toFixed(2)}</span></div>
-              <p className="text-xs text-muted-foreground">Demo order · No payment is collected.</p>
+              {order.length > 0 && (!user ? <AccountDialog checkout /> : <Button onClick={() => void pay()} disabled={checkoutBusy}>{checkoutBusy ? "Opening secure checkout…" : `Pay $${total.toFixed(2)} with Stripe`}</Button>)}
+              {checkoutError && <p role="alert" className="text-sm text-destructive">{checkoutError}</p>}
+              <p className="text-xs text-muted-foreground">Secure payment through Stripe. Only your order total is shared.</p>
             </DialogContent>
           </Dialog>
         </div>
       </header>
 
       <main>
+        <PaymentResult {...(sessionId ? { sessionId } : {})} cancelled={payment === "cancelled"} onPaid={clearPaidCart} />
         <SushiConveyorMenu
-          items={SUSHI_BELT_DISHES}
-          legend={SUSHI_BELT_LEGEND}
+          items={dishes}
           eyebrow="Kaiten · Lunch belt"
           heading="A little of everything."
           caption="Fresh nigiri, signature rolls, and a sweet finish. Every plate, made to be enjoyed."
@@ -82,7 +129,7 @@ export default function SushiConveyorMenuDemo({ autoplay = true }: { autoplay?: 
 
         <section ref={menuRef} className="mx-auto max-w-7xl scroll-mt-6 px-6 py-12 md:px-10">
           <div className="flex items-center justify-between gap-4"><div><p className="text-xs text-muted-foreground">FROM THE KITCHEN</p><h2 className="menu-title mt-2 text-3xl">Find your favorite plate.</h2></div><Button variant="ghost" onClick={() => setShowMenu((value) => !value)} aria-expanded={showMenu}> {showMenu ? "Close menu" : "All 8 plates"}<ArrowDown className={showMenu ? "rotate-180" : ""} /></Button></div>
-          {showMenu && <div className="mt-8 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">{SUSHI_BELT_DISHES.map((dish) => <article key={dish.id} className="menu-item border-b py-5"><img src={dish.image} alt={dish.name} className="menu-item-image mx-auto aspect-square w-40 object-contain" /><div className="mt-4 flex justify-between gap-3"><h3 className="text-sm font-semibold">{dish.name}</h3><span className="text-sm tabular-nums">{dish.price}</span></div><p className="mt-2 min-h-14 text-xs leading-relaxed text-muted-foreground">{dish.description}</p><Button variant="outline" className="mt-3 w-full" onClick={() => add(dish)}><CirclePlus />Add to order</Button></article>)}</div>}
+          {showMenu && <div className="mt-8 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">{dishes.map((dish) => <article key={dish.id} className="menu-item border-b py-5"><img src={dish.image} alt={dish.name} className="menu-item-image mx-auto aspect-square w-40 object-contain" /><div className="mt-4 flex justify-between gap-3"><h3 className="text-sm font-semibold">{dish.name}</h3><span className="text-sm tabular-nums">{dish.price}</span></div><p className="mt-2 min-h-14 text-xs leading-relaxed text-muted-foreground">{dish.description}</p><Button variant="outline" className="mt-3 w-full" onClick={() => add(dish)}><CirclePlus />Add to order</Button></article>)}</div>}
         </section>
       </main>
       <footer className="mx-auto flex max-w-7xl items-center justify-between gap-4 border-t px-6 py-5 text-xs text-muted-foreground md:px-10"><span>Sushi conveyor</span><span>Kaiten · A fresh kind of lunch</span></footer>

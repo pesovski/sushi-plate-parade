@@ -53,6 +53,42 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          active: boolean
+          description: string
+          details: string[]
+          id: string
+          image: string
+          name: string
+          position: number
+          price_cents: number
+          tier: number
+        }
+        Insert: {
+          active?: boolean
+          description: string
+          details?: string[]
+          id: string
+          image: string
+          name: string
+          position?: number
+          price_cents: number
+          tier: number
+        }
+        Update: {
+          active?: boolean
+          description?: string
+          details?: string[]
+          id?: string
+          image?: string
+          name?: string
+          position?: number
+          price_cents?: number
+          tier?: number
+        }
+        Relationships: []
+      }
       stripe_events: {
         Row: {
           event_type: string
