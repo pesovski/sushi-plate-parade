@@ -11,6 +11,7 @@
 # Page branding
 - [x] Use the uploaded icon as the browser tab icon.
 - [x] Use the uploaded logo in the page header and verify it on desktop and mobile.
+- [x] Swap in the newly uploaded wide Restorani.bar logo in the page header; verified on desktop and mobile.
 
 # Sign-in methods
 - [x] Remove the Sign in with Lovable button.
