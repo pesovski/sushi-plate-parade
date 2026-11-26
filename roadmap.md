@@ -6,4 +6,4 @@
 - [x] Store user-owned orders and enforce signed-in ordering.
 - [x] Connect the existing Stripe account securely.
 - [x] Implement authenticated cart checkout and payment confirmation.
-- [ ] Verify checkout and payment confirmation end-to-end: blocked by declined test-customer access; awaiting user sign-in.
+- [x] Verify checkout and payment confirmation end-to-end: user completed checkout; Cloud records the $11.00 USD order as paid with a payment reference and confirmation timestamp.
