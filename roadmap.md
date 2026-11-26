@@ -27,6 +27,10 @@
 - [x] Confirm conversation shape and history storage: no persistence; use a temporary single-session assistant rather than a saved thread list.
 - [x] Add a top-bar assistant connected to the live menu and React cart.
 - [x] Verify real AI replies add two salmon and one tuna ($15.20), recommend without changing the cart, remove tuna ($8.40), and open sign-in-gated checkout; desktop/mobile and no-history reload checks pass.
+- [x] Switch the assistant model to Claude Haiku 5.5 on the Messages surface; re-verify add/recommend/remove/review.
+
+# Phone install option
+- [x] Offer an "install as app" option on phones: home-screen support with app name, icon and theme, no offline caching.
 
 # Admin orders
 - [x] Add secure admin access, all-order viewing, and accepted/delivered fulfillment controls.

@@ -16,6 +16,7 @@ import { AdminOrdersLink } from "@/components/admin-orders-link";
 import { useAccount } from "@/components/account-provider";
 import logoAsset from "@/assets/restorani-logo-wide.png.asset.json";
 import { MenuAssistant } from "@/components/menu-assistant";
+import { InstallPrompt } from "@/components/install-prompt";
 import { assistantCartSchema } from "@/lib/menu-assistant-model";
 
 export default function SushiConveyorMenuDemo({ autoplay = true, payment, sessionId }: { autoplay?: boolean; payment?: "success" | "cancelled" | undefined; sessionId?: string | undefined }) {
@@ -148,6 +149,7 @@ export default function SushiConveyorMenuDemo({ autoplay = true, payment, sessio
         </section>
       </main>
       <footer className="mx-auto flex max-w-7xl items-center justify-between gap-4 border-t px-6 py-5 text-xs text-muted-foreground md:px-10"><span>Sushi conveyor</span><span>Kaiten · A fresh kind of lunch</span></footer>
+      <InstallPrompt />
     </div>
   );
 }
