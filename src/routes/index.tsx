@@ -10,9 +10,9 @@ export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(catalogOptions),
   head: () => ({
     meta: [
-      { title: "Sushi Conveyor — Fresh Plates & Signature Rolls" },
+      { title: "restorani.bar" },
       { name: "description", content: "Explore fresh nigiri, signature sushi rolls, and mochi. Sign in to order your favorite plates with secure Stripe checkout." },
-      { property: "og:title", content: "Sushi Conveyor — Fresh Plates & Signature Rolls" },
+      { property: "og:title", content: "restorani.bar" },
       { property: "og:description", content: "Fresh nigiri, signature rolls, and a sweet finish. Explore the sushi conveyor and pick your favorite plates." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
