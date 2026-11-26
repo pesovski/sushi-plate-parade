@@ -16,8 +16,11 @@ export type Database = {
     Tables: {
       orders: {
         Row: {
+          accepted_at: string | null
           created_at: string
           currency: string
+          delivered_at: string | null
+          fulfillment_status: string
           id: string
           items: Json
           paid_at: string | null
@@ -28,8 +31,11 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          accepted_at?: string | null
           created_at?: string
           currency?: string
+          delivered_at?: string | null
+          fulfillment_status?: string
           id?: string
           items: Json
           paid_at?: string | null
@@ -40,8 +46,11 @@ export type Database = {
           user_id: string
         }
         Update: {
+          accepted_at?: string | null
           created_at?: string
           currency?: string
+          delivered_at?: string | null
+          fulfillment_status?: string
           id?: string
           items?: Json
           paid_at?: string | null
@@ -107,15 +116,43 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      set_order_fulfillment: {
+        Args: { _order_id: string; _status: string }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -242,6 +279,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin"],
+    },
   },
 } as const

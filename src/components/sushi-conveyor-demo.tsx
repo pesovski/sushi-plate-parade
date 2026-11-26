@@ -12,6 +12,7 @@ import { catalogOptions } from "@/lib/catalog-query";
 import { createCheckout } from "@/lib/checkout.functions";
 import { PaymentResult } from "@/components/payment-result";
 import { AccountDialog } from "@/components/account-dialog";
+import { AdminOrdersLink } from "@/components/admin-orders-link";
 import { useAccount } from "@/components/account-provider";
 import logoAsset from "@/assets/restorani-logo-wide.png.asset.json";
 import { MenuAssistant } from "@/components/menu-assistant";
@@ -95,6 +96,7 @@ export default function SushiConveyorMenuDemo({ autoplay = true, payment, sessio
             }));
           }} />
           <AccountDialog />
+          <AdminOrdersLink />
           <span aria-live="polite" className="hidden text-xs text-accent-foreground sm:block">{flash ? "Added to your order" : ""}</span>
           <Dialog open={orderOpen} onOpenChange={setOrderOpen}>
             <DialogTrigger asChild>

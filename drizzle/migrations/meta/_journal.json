@@ -15,6 +15,13 @@
       "when": 1795715008228,
       "tag": "0001_create_sushi_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795717642630,
+      "tag": "0002_admin_order_fulfillment",
+      "breakpoints": true
     }
   ]
 }

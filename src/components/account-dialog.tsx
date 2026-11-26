@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAccount } from "@/components/account-provider";
 import { getMyOrders } from "@/lib/orders.functions";
 import { verifyCheckout } from "@/lib/checkout.functions";
+import { fulfillmentLabels } from "@/lib/admin-orders-model";
 
 export function AccountDialog({ checkout = false }: { checkout?: boolean }) {
   const { user, loading, signOut } = useAccount();
@@ -59,7 +60,7 @@ export function AccountDialog({ checkout = false }: { checkout?: boolean }) {
       {user ? <>
         <p className="break-all text-sm">{user.email}</p>
         <h3 className="border-t pt-4 font-semibold">Your orders</h3>
-        {orders.isPending ? <p className="text-sm text-muted-foreground">Loading your orders…</p> : orders.isError ? <div><p role="alert" className="text-sm text-destructive">Your orders could not be loaded.</p><Button variant="outline" onClick={() => void orders.refetch()}>Try again</Button></div> : orders.data?.length ? <ul className="divide-y">{orders.data.map((order) => <li key={order.id} className="flex justify-between gap-4 py-3"><div><p className="text-sm font-medium">Order {order.id.slice(0, 8)}</p><p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()} · {order.status}</p></div><span className="text-sm">${(order.total_cents / 100).toFixed(2)}</span></li>)}</ul> : <p className="text-sm text-muted-foreground">No orders yet.</p>}
+        {orders.isPending ? <p className="text-sm text-muted-foreground">Loading your orders…</p> : orders.isError ? <div><p role="alert" className="text-sm text-destructive">Your orders could not be loaded.</p><Button variant="outline" onClick={() => void orders.refetch()}>Try again</Button></div> : orders.data?.length ? <ul className="divide-y">{orders.data.map((order) => <li key={order.id} className="flex justify-between gap-4 py-3"><div><p className="text-sm font-medium">Order {order.id.slice(0, 8)}</p><p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()} · {order.status}</p>{order.status === "paid" && <p className="text-xs text-accent-foreground">{fulfillmentLabels[order.fulfillment_status]}</p>}</div><span className="text-sm">${(order.total_cents / 100).toFixed(2)}</span></li>)}</ul> : <p className="text-sm text-muted-foreground">No orders yet.</p>}
         <Button variant="outline" onClick={async () => { try { await signOut(); setOpen(false); } catch { setError("Could not sign out. Please try again."); } }}><LogOut />Sign out</Button>
       </> : <>
         <form className="grid gap-3" onSubmit={(event) => void submit(event)}>

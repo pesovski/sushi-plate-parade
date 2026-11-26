@@ -7,7 +7,7 @@ export const getMyOrders = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const userId = requireOrderUser(context.userId);
     const { data, error } = await context.supabase.from("orders")
-      .select("id,created_at,status,currency,total_cents,items,stripe_session_id")
+      .select("id,created_at,status,currency,total_cents,items,stripe_session_id,fulfillment_status")
       .eq("user_id", userId).order("created_at", { ascending: false }).limit(50);
     if (error) throw new Error("Your orders could not be loaded. Please try again.");
     return data;

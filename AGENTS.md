@@ -41,3 +41,5 @@ use the editor.
 - Keep React Email templates in the managed registry with inline email-safe brand styles; `/lovable/` preview requests bypass application redirects and CSRF filtering because they authenticate themselves.
 - The menu assistant streams Gateway Responses through a same-origin public route using only public catalog reads; tools can update or review a validated draft cart but never invoke payment or write orders.
 - Compose the temporary assistant chat from AI Elements, retain full message parts in React memory only, and derive cart actions from server-validated catalog IDs and quantities so existing checkout remains authoritative.
+- Keep admin orders under the authenticated layout and enforce protected database roles in every admin server function; this prevents direct endpoint access by customers.
+- Keep fulfillment separate from payment, and mutate it through a role-checked database function with ordered transitions; admins must never overwrite checkout-owned payment state.

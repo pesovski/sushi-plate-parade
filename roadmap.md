@@ -27,3 +27,8 @@
 - [x] Confirm conversation shape and history storage: no persistence; use a temporary single-session assistant rather than a saved thread list.
 - [x] Add a top-bar assistant connected to the live menu and React cart.
 - [x] Verify real AI replies add two salmon and one tuna ($15.20), recommend without changing the cart, remove tuna ($8.40), and open sign-in-gated checkout; desktop/mobile and no-history reload checks pass.
+
+# Admin orders
+- [x] Add secure admin access, all-order viewing, and accepted/delivered fulfillment controls.
+- [x] Assign ivica.pesovski@gmail.com as admin.
+- [x] Verify signed-in admin sees all orders; earlier $11 test order accepted then delivered and reads back after reload and in own history; guest redirects to sign-in, non-admin endpoint tests deny reads/writes, desktop/mobile layouts checked.
