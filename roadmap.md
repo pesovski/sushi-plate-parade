@@ -22,3 +22,8 @@
 - [x] Prepare managed sending and a homepage-branded order confirmation template; secure preview renders on desktop and mobile.
 - [x] Send the itemized confirmation after verified payment; snapshot, paid-only, recipient, idempotency and suppression tests pass.
 - [ ] Verify real delivery: blocked until sender DNS verification completes and these changes are published.
+
+# AI menu assistant
+- [x] Confirm conversation shape and history storage: no persistence; use a temporary single-session assistant rather than a saved thread list.
+- [x] Add a top-bar assistant connected to the live menu and React cart.
+- [x] Verify real AI replies add two salmon and one tuna ($15.20), recommend without changing the cart, remove tuna ($8.40), and open sign-in-gated checkout; desktop/mobile and no-history reload checks pass.

@@ -14,6 +14,8 @@ import { PaymentResult } from "@/components/payment-result";
 import { AccountDialog } from "@/components/account-dialog";
 import { useAccount } from "@/components/account-provider";
 import logoAsset from "@/assets/restorani-logo-wide.png.asset.json";
+import { MenuAssistant } from "@/components/menu-assistant";
+import { assistantCartSchema } from "@/lib/menu-assistant-model";
 
 export default function SushiConveyorMenuDemo({ autoplay = true, payment, sessionId }: { autoplay?: boolean; payment?: "success" | "cancelled" | undefined; sessionId?: string | undefined }) {
   const { user } = useAccount();
@@ -24,6 +26,7 @@ export default function SushiConveyorMenuDemo({ autoplay = true, payment, sessio
   const [checkoutError, setCheckoutError] = React.useState("");
   const attempt = React.useRef<string | null>(null);
   const [order, setOrder] = React.useState<ConveyorDish[]>([]);
+  const [orderOpen, setOrderOpen] = React.useState(false);
   const [restored, setRestored] = React.useState(false);
   React.useEffect(() => {
     try {
@@ -73,15 +76,27 @@ export default function SushiConveyorMenuDemo({ autoplay = true, payment, sessio
     window.setTimeout(() => menuRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" }), 50);
   };
   const total = order.reduce((sum, item) => sum + Number(item.price.slice(1)), 0);
+  const assistantCart = dishes.flatMap((dish) => {
+    const quantity = order.filter((item) => item.id === dish.id).length;
+    return quantity ? [{ id: dish.id, quantity }] : [];
+  });
 
   return (
     <div data-sushi-demo className="min-h-svh bg-background text-foreground">
-      <header className="mx-auto flex max-w-7xl items-center justify-between gap-4 border-b px-6 py-6 md:px-10">
+      <header className="mx-auto flex max-w-7xl items-center justify-between gap-2 border-b px-4 py-6 sm:px-6 md:px-10">
         <img src={logoAsset.url} alt="Restorani.bar" width={1902} height={610} className="w-40 min-w-0 shrink object-contain sm:w-56" />
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 sm:gap-3">
+          <MenuAssistant cart={assistantCart} total={total} onReview={() => setOrderOpen(true)} onCartChange={(cart) => {
+            const result = assistantCartSchema.safeParse(cart);
+            if (!result.success || result.data.some((item) => !dishes.some((dish) => dish.id === item.id))) return;
+            setOrder(result.data.flatMap(({ id, quantity }) => {
+              const dish = dishes.find((item) => item.id === id);
+              return dish ? Array.from({ length: quantity }, () => dish) : [];
+            }));
+          }} />
           <AccountDialog />
           <span aria-live="polite" className="hidden text-xs text-accent-foreground sm:block">{flash ? "Added to your order" : ""}</span>
-          <Dialog>
+          <Dialog open={orderOpen} onOpenChange={setOrderOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" data-order-count aria-label={`Your order: ${order.length} ${order.length === 1 ? "plate" : "plates"}`} className="rounded-full">
                 <ShoppingBag aria-hidden="true" /><span className="hidden sm:inline">Your order</span><span data-order-total className="min-w-4 tabular-nums">{order.length}</span>

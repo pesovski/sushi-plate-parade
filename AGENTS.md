@@ -39,3 +39,5 @@ use the editor.
 - Keep only a temporary list of cart IDs in sessionStorage to survive OAuth navigation; never treat its contents as trusted prices or permissions.
 - Send order confirmations through managed email from verified-payment server code using trusted order snapshots, the authenticated owner's email, and an order-derived idempotency key; email failure must not reverse payment and no email tables or queues are needed.
 - Keep React Email templates in the managed registry with inline email-safe brand styles; `/lovable/` preview requests bypass application redirects and CSRF filtering because they authenticate themselves.
+- The menu assistant streams Gateway Responses through a same-origin public route using only public catalog reads; tools can update or review a validated draft cart but never invoke payment or write orders.
+- Compose the temporary assistant chat from AI Elements, retain full message parts in React memory only, and derive cart actions from server-validated catalog IDs and quantities so existing checkout remains authoritative.
