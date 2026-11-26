@@ -62,7 +62,7 @@ export function AccountDialog({ checkout = false }: { checkout?: boolean }) {
     finally { setBusy(false); }
   };
   return <Dialog open={open} onOpenChange={setOpen}>
-    <DialogTrigger asChild><Button variant={checkout ? "default" : "ghost"} disabled={loading} className={checkout ? "w-full" : ""}><UserRound />{loading ? "Loading…" : user ? "My account" : checkout ? "Sign in to checkout" : "Sign in"}</Button></DialogTrigger>
+    <DialogTrigger asChild><Button variant={checkout ? "default" : "ghost"} disabled={loading} className={checkout ? "w-full" : ""} aria-label={loading ? "Loading account" : user ? "My account" : checkout ? "Sign in to checkout" : "Sign in"} title={user ? "My account" : "Sign in"}><UserRound /><span className={checkout ? "" : "hidden sm:inline"}>{loading ? "Loading…" : user ? "My account" : checkout ? "Sign in to checkout" : "Sign in"}</span></Button></DialogTrigger>
     <DialogContent className="max-h-[85svh] overflow-y-auto">
       <DialogTitle>{user ? "My account" : mode === "signup" ? "Create your account" : mode === "forgot" ? "Reset your password" : "Welcome back"}</DialogTitle>
       <DialogDescription>{user ? "Your sushi orders, in one place." : "Sign in before placing an order."}</DialogDescription>

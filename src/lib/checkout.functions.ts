@@ -24,7 +24,9 @@ export const createCheckout = createServerFn({ method: "POST" })
     const { data: existing, error: readError } = await supabaseAdmin.from("orders").select("id,user_id,stripe_session_id,total_cents,items,status").eq("id", data.attempt).maybeSingle();
     if (readError) throw new Error("Could not prepare your order.");
     if (existing) {
-      if (existing.user_id !== userId || existing.total_cents !== priced.total || JSON.stringify(existing.items) !== JSON.stringify(priced.items)) throw new Error("Your cart changed. Please start checkout again.");
+      const storedItems = z.array(z.object({ id: z.string(), name: z.string(), quantity: z.number(), unit_price_cents: z.number() })).safeParse(existing.items);
+      const sameItems = storedItems.success && storedItems.data.length === priced.items.length && priced.items.every((item) => storedItems.data.some((stored) => stored.id === item.id && stored.quantity === item.quantity && stored.unit_price_cents === item.unit_price_cents));
+      if (existing.user_id !== userId || existing.total_cents !== priced.total || !sameItems) throw new Error("Your cart changed. Please start checkout again.");
       if (existing.stripe_session_id) {
         const session = await stripe.checkout.sessions.retrieve(existing.stripe_session_id);
         if (session.status === "open" && session.url) return { url: session.url, orderId: existing.id, test: !session.livemode };
@@ -40,7 +42,7 @@ export const createCheckout = createServerFn({ method: "POST" })
     const allowed = new Set([requestOrigin, "http://localhost:8080", "https://id-preview--9989ff2e-b223-4cf5-a2bd-10f176e12e1a.lovable.app", "https://project--9989ff2e-b223-4cf5-a2bd-10f176e12e1a.lovable.app", "https://project--9989ff2e-b223-4cf5-a2bd-10f176e12e1a-dev.lovable.app"]);
     const origin = originHeader && allowed.has(originHeader) ? originHeader : requestOrigin;
     const session = await stripe.checkout.sessions.create({
-      mode: "payment", payment_method_types: ["card"],
+      mode: "payment",
       client_reference_id: userId, customer_email: auth.user.email,
       line_items: [stripeCartLine(priced.total)],
       metadata: { order_id: data.attempt },

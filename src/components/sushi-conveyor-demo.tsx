@@ -77,11 +77,11 @@ export default function SushiConveyorMenuDemo({ autoplay = true, payment, sessio
     <div data-sushi-demo className="min-h-svh bg-background text-foreground">
       <header className="mx-auto flex max-w-7xl items-center justify-between gap-4 border-b px-6 py-6 md:px-10">
         <div className="flex items-center gap-3">
-          <AccountDialog />
           <span className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground"><Utensils className="size-5" aria-hidden="true" /></span>
           <div><p className="text-lg font-semibold">Sushi conveyor</p><p className="text-xs text-muted-foreground">Fresh plates. Good company.</p></div>
         </div>
         <div className="flex items-center gap-3">
+          <AccountDialog />
           <span aria-live="polite" className="hidden text-xs text-accent-foreground sm:block">{flash ? "Added to your order" : ""}</span>
           <Dialog>
             <DialogTrigger asChild>
