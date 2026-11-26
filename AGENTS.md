@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Application structure
+- Keep the reusable conveyor in `src/components/ui/sushi-conveyor-menu.tsx` and its demo composition separate so animation and consumer order state remain independent.
+- Keep sample dishes and tier prices in `src/lib/sushi-menu.ts`, with CDN asset pointers, so all demo views share the same menu data.
+- Demo orders use ephemeral React state and do not submit purchases, so this integration needs no backend or payment service.
