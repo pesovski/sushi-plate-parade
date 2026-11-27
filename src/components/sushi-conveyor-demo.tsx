@@ -17,6 +17,7 @@ import { useAccount } from "@/components/account-provider";
 import logoAsset from "@/assets/restorani-logo-wide.png.asset.json";
 import { MenuAssistant } from "@/components/menu-assistant";
 import { InstallPrompt } from "@/components/install-prompt";
+import { OrderAlerts } from "@/components/order-alerts";
 import { assistantCartSchema } from "@/lib/menu-assistant-model";
 
 export default function SushiConveyorMenuDemo({ autoplay = true, payment, sessionId }: { autoplay?: boolean; payment?: "success" | "cancelled" | undefined; sessionId?: string | undefined }) {
@@ -97,6 +98,7 @@ export default function SushiConveyorMenuDemo({ autoplay = true, payment, sessio
             }));
           }} />
           <AccountDialog />
+          <OrderAlerts />
           <AdminOrdersLink />
           <span aria-live="polite" className="hidden text-xs text-accent-foreground sm:block">{flash ? "Added to your order" : ""}</span>
           <Dialog open={orderOpen} onOpenChange={setOrderOpen}>

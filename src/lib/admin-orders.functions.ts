@@ -27,5 +27,12 @@ export const changeOrderFulfillment = createServerFn({ method: "POST" }).middlew
     requireAdmin(!role.error && role.data === true);
     const result = await context.supabase.rpc("set_order_fulfillment", { _order_id: data.orderId, _status: data.status });
     if (result.error) throw new Error("This order could not be updated. Refresh and check its payment and fulfillment status.");
-    return { saved: true };
+    let push: string = "not-needed";
+    if (data.status === "accepted") {
+      try {
+        const { notifyOrderAccepted } = await import("./push.server");
+        push = await notifyOrderAccepted(data.orderId);
+      } catch { push = "failed"; }
+    }
+    return { saved: true, push };
   });

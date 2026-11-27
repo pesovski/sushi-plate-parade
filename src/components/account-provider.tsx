@@ -30,6 +30,18 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     return () => { alive = false; subscription.unsubscribe(); };
   }, [queryClient, router]);
   const signOut = async () => {
+    // Detach this browser before signing out so another account cannot receive its alerts.
+    if (typeof Notification !== "undefined" && Notification.permission === "granted" && localStorage.getItem("order-alerts-enabled") === "yes") {
+      const { getPushToken, pushClient } = await import("@/lib/push-client");
+      const token = await getPushToken();
+      if (token) {
+        const { removePushDevice } = await import("@/lib/push.functions");
+        await removePushDevice({ data: { token } });
+      }
+      const client = await pushClient();
+      if (client) await client.sdk.deleteToken(client.messaging);
+      localStorage.removeItem("order-alerts-enabled");
+    }
     await queryClient.cancelQueries();
     queryClient.clear();
     const { error } = await supabase.auth.signOut();

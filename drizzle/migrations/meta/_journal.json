@@ -22,6 +22,13 @@
       "when": 1795717642630,
       "tag": "0002_admin_order_fulfillment",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795782085573,
+      "tag": "0003_customer_order_push",
+      "breakpoints": true
     }
   ]
 }

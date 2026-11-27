@@ -44,3 +44,4 @@ use the editor.
 - Keep admin orders under the authenticated layout and enforce protected database roles in every admin server function; this prevents direct endpoint access by customers.
 - Keep fulfillment separate from payment, and mutate it through a role-checked database function with ordered transitions; admins must never overwrite checkout-owned payment state.
 - Keep phone install support manifest-only (web app manifest, icons, and a dismissible in-page offer) with no service worker or offline caching, so installed apps and previews never serve stale content.
+- Order alerts use a dedicated Firebase messaging worker without app caching; register authenticated owner devices, detach before sign-out, and send through the connector only after admin-verified acceptance with a server-owned atomic attempt claim to prevent duplicate alerts.

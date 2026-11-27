@@ -17,6 +17,7 @@ export type Database = {
       orders: {
         Row: {
           accepted_at: string | null
+          accepted_push_attempted_at: string | null
           created_at: string
           currency: string
           delivered_at: string | null
@@ -32,6 +33,7 @@ export type Database = {
         }
         Insert: {
           accepted_at?: string | null
+          accepted_push_attempted_at?: string | null
           created_at?: string
           currency?: string
           delivered_at?: string | null
@@ -47,6 +49,7 @@ export type Database = {
         }
         Update: {
           accepted_at?: string | null
+          accepted_push_attempted_at?: string | null
           created_at?: string
           currency?: string
           delivered_at?: string | null
@@ -98,6 +101,24 @@ export type Database = {
         }
         Relationships: []
       }
+      push_devices: {
+        Row: {
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       stripe_events: {
         Row: {
           event_type: string
@@ -146,6 +167,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      register_push_device: { Args: { _token: string }; Returns: undefined }
       set_order_fulfillment: {
         Args: { _order_id: string; _status: string }
         Returns: undefined

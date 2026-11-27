@@ -34,8 +34,8 @@ function AdminOrders() {
   const access = useQuery({ queryKey: ["admin-access", user?.id], queryFn: () => checkAccess(), enabled: !!user });
   const orders = useQuery({ queryKey: ["admin-orders", user?.id, page], queryFn: () => read({ data: { page } }), enabled: !!user && access.data === true });
   const mutation = useMutation({ mutationFn: (data: { orderId: string; status: "accepted" | "delivered" }) => change({ data }),
-    onSuccess: async (_, input) => {
-      setNotice(`Order ${input.orderId.slice(0, 8)} ${input.status}.`);
+    onSuccess: async (result, input) => {
+      setNotice(`Order ${input.orderId.slice(0, 8)} ${input.status}.${result.push === "failed" ? " Customer notification could not be sent; the order status is saved." : result.push === "sent" ? " Customer notification sent." : result.push === "no-devices" ? " Customer has not enabled notifications." : ""}`);
       await Promise.all([queryClient.invalidateQueries({ queryKey: ["admin-orders"] }), queryClient.invalidateQueries({ queryKey: ["my-orders"] })]);
     },
   });
