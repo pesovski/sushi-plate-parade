@@ -50,6 +50,7 @@ export function OrderAlerts() {
         const client = await pushClient();
         if (client) await client.sdk.deleteToken(client.messaging);
         localStorage.removeItem("order-alerts-enabled"); setEnabled(false);
+        setRevision((value) => value + 1);
         setNotice("Order alerts are off on this device.");
       } catch (error) { setNotice(error instanceof Error ? error.message : "Order alerts could not be disabled."); }
       finally { setBusy(false); }
@@ -66,7 +67,7 @@ export function OrderAlerts() {
       localStorage.setItem("order-alerts-enabled", "yes"); setEnabled(true);
       setRevision((value) => value + 1);
       setNotice("You’ll receive an alert when your order is accepted.");
-    } catch (error) { setNotice(error instanceof Error ? error.message : "Order alerts could not be enabled."); }
+    } catch { setNotice("This browser could not register notifications. Open restorani.bar in its own tab and allow notifications in site settings. On iPhone, use the Home Screen app."); }
     finally { setBusy(false); }
   };
 
