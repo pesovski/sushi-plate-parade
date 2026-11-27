@@ -33,6 +33,7 @@
 - [x] Offer an "install as app" option on phones: home-screen support with app name, icon and theme, no offline caching.
 
 # Admin orders
+- [ ] Add customer push notifications when an admin accepts an order; connect Firebase web push and verify delivery.
 - [x] Add secure admin access, all-order viewing, and accepted/delivered fulfillment controls.
 - [x] Assign ivica.pesovski@gmail.com as admin.
 - [x] Verify signed-in admin sees all orders; earlier $11 test order accepted then delivered and reads back after reload and in own history; guest redirects to sign-in, non-admin endpoint tests deny reads/writes, desktop/mobile layouts checked.
